@@ -1,5 +1,6 @@
-import { register, activateUser, login } from '../services/auth.service.js';
-import { setRefreshTokenCookie } from '../lib/tokens.js';
+import { register, activateUser, login, refresh, logout } from '../services/auth.service.js';
+import { getRefreshTokenFromRequest, clearRefreshTokenCookie, setRefreshTokenCookie } from '../lib/tokens.js';
+
 
 function respondWithSession(res, { accessToken, refreshToken, user }) {
   setRefreshTokenCookie(res, refreshToken);
@@ -23,3 +24,19 @@ export async function loginController(req, res) {
 
   respondWithSession(res, session);
 }
+
+export async function refreshController(req, res) {
+  const rawRefreshToken = getRefreshTokenFromRequest(req);
+  const session = await refresh(rawRefreshToken);
+
+  respondWithSession(res, session);
+}
+
+export async function logoutController(req, res) {
+  const rawRefreshToken = getRefreshTokenFromRequest(req);
+
+  await logout(rawRefreshToken);
+  clearRefreshTokenCookie(res);
+  res.status(204).end();
+}
+

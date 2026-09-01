@@ -120,3 +120,46 @@ export async function login({ email, password }) {
 
   return { accessToken, refreshToken, user: toPublicUser(user) };
 }
+
+export async function refresh(rawRefreshToken) {
+  if (!rawRefreshToken) {
+    throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Missing refresh token');
+  }
+
+  const tokenHash = hashToken(rawRefreshToken);
+
+  const storedToken = await prisma.refreshToken.findUnique({
+    where: { tokenHash },
+    include: { user: true },
+  });
+
+  const isValid =
+    storedToken && !storedToken.revokedAt && storedToken.expiresAt > new Date();
+
+  if (!isValid) {
+    throw new ApiError(401, 'INVALID_REFRESH_TOKEN', 'Invalid or expired refresh token');
+  }
+
+  await prisma.refreshToken.update({
+    where: { id: storedToken.id },
+    data: { revokedAt: new Date() },
+  });
+
+  const session = await createSession(storedToken.userId);
+
+  return { ...session, user: toPublicUser(storedToken.user) };
+}
+
+export async function logout(rawRefreshToken) {
+  if (!rawRefreshToken) {
+    return;
+  }
+
+  const tokenHash = hashToken(rawRefreshToken);
+
+  await prisma.refreshToken.updateMany({
+    where: { tokenHash, revokedAt: null },
+    data: { revokedAt: new Date() },
+  });
+}
+

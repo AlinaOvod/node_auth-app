@@ -5,6 +5,8 @@ import {
   registerController,
   activateController,
   loginController,
+  refreshController,
+  logoutController,
 } from '../controllers/auth.controller.js';
 
 export const authRouter = Router();
@@ -12,3 +14,6 @@ export const authRouter = Router();
 authRouter.post('/registration', validate(registerSchema), registerController);
 authRouter.get('/activation/:activationToken', activateController);
 authRouter.post('/login', validate(loginSchema), loginController);
+authRouter.post('/refresh', refreshController);
+authRouter.post('/logout', logoutController);
+
