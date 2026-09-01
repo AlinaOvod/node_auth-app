@@ -1,6 +1,17 @@
-import { register, activateUser, login, refresh, logout } from '../services/auth.service.js';
-import { getRefreshTokenFromRequest, clearRefreshTokenCookie, setRefreshTokenCookie } from '../lib/tokens.js';
-
+import {
+  register,
+  activateUser,
+  login,
+  refresh,
+  logout,
+  requestPasswordReset,
+  confirmPasswordReset,
+} from '../services/auth.service.js';
+import {
+  getRefreshTokenFromRequest,
+  clearRefreshTokenCookie,
+  setRefreshTokenCookie,
+} from '../lib/tokens.js';
 
 function respondWithSession(res, { accessToken, refreshToken, user }) {
   setRefreshTokenCookie(res, refreshToken);
@@ -40,3 +51,14 @@ export async function logoutController(req, res) {
   res.status(204).end();
 }
 
+export async function requestPasswordResetController(req, res) {
+  await requestPasswordReset(req.body.email);
+  res.status(200).json({});
+}
+
+export async function confirmPasswordResetController(req, res) {
+  const { token } = req.params;
+
+  await confirmPasswordReset(token, req.body.password);
+  res.status(200).json({});
+}
