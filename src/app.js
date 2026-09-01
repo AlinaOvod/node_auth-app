@@ -3,6 +3,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { authRouter } from './routes/auth.routes.js';
+import { usersRouter } from './routes/users.routes.js';
 
 export const createServer = () => {
   const app = express();
@@ -12,6 +13,7 @@ export const createServer = () => {
   app.use(cors({ origin: process.env.CLIENT_URL, credentials: true }));
 
   app.use('/auth', authRouter);
+  app.use('/users', usersRouter);
 
   app.use(errorHandler);
 
