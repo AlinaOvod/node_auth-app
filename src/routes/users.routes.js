@@ -4,11 +4,13 @@ import { validate } from '../middlewares/validate.js';
 import {
   updateNameSchema,
   changePasswordSchema,
+  changeEmailSchema,
 } from '../validators/users.schemas.js';
 import {
   getMeController,
   updateNameController,
   changePasswordController,
+  changeEmailController,
 } from '../controllers/users.controller.js';
 
 export const usersRouter = Router();
@@ -22,4 +24,10 @@ usersRouter.post(
   '/me/password',
   validate(changePasswordSchema),
   changePasswordController,
+);
+
+usersRouter.post(
+  '/me/email',
+  validate(changeEmailSchema),
+  changeEmailController,
 );

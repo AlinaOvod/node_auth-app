@@ -17,3 +17,8 @@ export const changePasswordSchema = z
     message: 'Passwords do not match',
     path: ['confirmation'],
   });
+
+export const changeEmailSchema = z.object({
+  password: z.string().min(1, 'Password is required'),
+  newEmail: z.string().email('Enter a valid email'),
+});
