@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma.js';
-import { hashPassword } from '../lib/password.js';
+import { hashPassword, verifyPassword } from '../lib/password.js';
 import {
   generateOpaqueToken,
   getRefreshTokenExpiry,
@@ -89,6 +89,32 @@ export async function activateUser(rawToken) {
       data: { isActive: true },
     });
   });
+
+  const { accessToken, refreshToken } = await createSession(user.id);
+
+  return { accessToken, refreshToken, user: toPublicUser(user) };
+}
+
+export async function login({ email, password }) {
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) {
+    throw new ApiError(401, 'INVALID_CREDENTIALS', 'Wrong email or password');
+  }
+
+  const isPasswordCorrect = await verifyPassword(password, user.passwordHash);
+
+  if (!isPasswordCorrect) {
+    throw new ApiError(401, 'INVALID_CREDENTIALS', 'Wrong email or password');
+  }
+
+  if (!user.isActive) {
+    throw new ApiError(
+      403,
+      'EMAIL_NOT_ACTIVATED',
+      'Please activate your account before logging in',
+    );
+  }
 
   const { accessToken, refreshToken } = await createSession(user.id);
 

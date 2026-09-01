@@ -1,5 +1,10 @@
-import { register, activateUser } from '../services/auth.service.js';
+import { register, activateUser, login } from '../services/auth.service.js';
 import { setRefreshTokenCookie } from '../lib/tokens.js';
+
+function respondWithSession(res, { accessToken, refreshToken, user }) {
+  setRefreshTokenCookie(res, refreshToken);
+  res.json({ accessToken, user });
+}
 
 export async function registerController(req, res) {
   await register(req.body);
@@ -8,9 +13,13 @@ export async function registerController(req, res) {
 
 export async function activateController(req, res) {
   const { activationToken } = req.params;
-  const { accessToken, refreshToken, user } =
-    await activateUser(activationToken);
+  const session = await activateUser(activationToken);
 
-  setRefreshTokenCookie(res, refreshToken);
-  res.json({ accessToken, user });
+  respondWithSession(res, session);
+}
+
+export async function loginController(req, res) {
+  const session = await login(req.body);
+
+  respondWithSession(res, session);
 }
