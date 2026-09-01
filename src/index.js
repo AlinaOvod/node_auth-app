@@ -2,7 +2,7 @@
 
 'use strict';
 
-import { createServer } from './app';
+import { createServer } from './app.js';
 
 const PORT = process.env.PORT || 3007;
 
