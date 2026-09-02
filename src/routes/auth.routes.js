@@ -15,6 +15,7 @@ import {
   requestPasswordResetController,
   confirmPasswordResetController,
 } from '../controllers/auth.controller.js';
+import { requireAuth } from '../middlewares/auth.js';
 
 export const authRouter = Router();
 
@@ -22,7 +23,7 @@ authRouter.post('/registration', validate(registerSchema), registerController);
 authRouter.get('/activation/:activationToken', activateController);
 authRouter.post('/login', validate(loginSchema), loginController);
 authRouter.post('/refresh', refreshController);
-authRouter.post('/logout', logoutController);
+authRouter.post('/logout', requireAuth, logoutController);
 
 authRouter.post(
   '/password-reset',
