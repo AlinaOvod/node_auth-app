@@ -6,6 +6,7 @@ import { authRouter } from './routes/auth.routes.js';
 import { usersRouter } from './routes/users.routes.js';
 // eslint-disable-next-line max-len
 import { confirmEmailChangeController } from './controllers/users.controller.js';
+import { notFound } from './middlewares/notFound.js';
 
 export const createServer = () => {
   const app = express();
@@ -18,6 +19,7 @@ export const createServer = () => {
   app.get('/users/me/email/confirm/:token', confirmEmailChangeController);
   app.use('/users', usersRouter);
 
+  app.use(notFound);
   app.use(errorHandler);
 
   return app;
